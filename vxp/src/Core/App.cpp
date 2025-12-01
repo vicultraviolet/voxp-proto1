@@ -3,6 +3,8 @@
 
 #include <Natrium/Graphics/Device.hpp>
 
+#include "Layers/GameLayer.hpp"
+
 namespace Vxp
 {
 	App::App(void)
@@ -16,10 +18,14 @@ namespace Vxp
 
 		m_Renderer = Na::Graphics::Renderer::Make(renderer_settings);
 		m_Renderer->bind_render_target(m_Display);
+
+		m_LayerManager.attach_layer(Na::MakeRef<GameLayer>(m_Window, m_Display, m_Renderer));
 	}
 
 	App::~App(void)
 	{
+		m_LayerManager.detach_all();
+
 		Na::Graphics::Device::Get()->wait_all();
 	}
 
