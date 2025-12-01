@@ -1,0 +1,3 @@
+[submodule "natrium"]
+	path = natrium
+	url = https://github.com/vicultraviolet/natrium-cpp.git
