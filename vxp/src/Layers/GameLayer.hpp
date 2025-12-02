@@ -13,6 +13,8 @@
 
 #include "Voxel/VoxelRegistry.hpp"
 
+#include "Voxel/Chunk.hpp"
+
 namespace Vxp
 {
 	class GameLayer : public Na::Layer
@@ -37,7 +39,8 @@ namespace Vxp
 
 		VoxelRegistry m_VoxelRegistry;
 
-		VoxelTypeID m_CurrentVoxel = VoxelTypeID::Dirt;
+		Chunk m_Chunk{ ChunkPosition{0, 0, 0} };
+		Chunk m_Chunk2{ ChunkPosition{0, 0, -1} };
 	};
 } // namespace Vxp
 

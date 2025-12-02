@@ -1,6 +1,7 @@
 #if !defined(VXP_VOXEL_TYPE_HPP)
 #define VXP_VOXEL_TYPE_HPP
 
+#include "Voxel/VoxelSide.hpp"
 #include "Voxel/VoxelTypeID.hpp"
 #include "Voxel/VoxelComponents.hpp"
 #include "Core/Renderer.hpp"
@@ -15,6 +16,8 @@ namespace Vxp
 		std::array<TextureHandle, 6> textures{};
 
 		VoxelComponents components;
+
+		[[nodiscard]] inline TextureHandle texture_at(VoxelSide side) { return textures[(u8)side]; }
 
 		template<typename T>
 		void set_component(const T& component)

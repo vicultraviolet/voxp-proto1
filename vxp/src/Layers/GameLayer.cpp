@@ -10,6 +10,37 @@
 
 namespace Vxp
 {
+	static void drawChunk(const Chunk& chunk, Renderer& renderer)
+	{
+		for (u8 y = 0; y < chunk.height(); y++)
+		{
+			for (u8 z = 0; z < chunk.depth(); z++)
+			{
+				for (u8 x = 0; x < chunk.width(); x++)
+				{
+					VoxelTypeID voxel = chunk[{y, z, x}];
+
+					if (voxel == VoxelTypeID::None)
+						continue;
+
+					glm::vec3 pos = LocalToVoxelPosition(chunk.position(), LocalPosition{ y, z, x });
+
+					const auto& voxel_type = VoxelRegistry::Get()->get_type(voxel);
+
+					for (u8 i = 0; i < voxel_type.textures.size(); i++)
+					{
+						renderer.add_quad(Quad{
+							.model =
+								glm::translate(glm::mat4(1.0f), pos)
+								* GetTransform((VoxelSide)(i + 1)),
+							.texture = voxel_type.textures[i]
+							});
+					}
+				}
+			}
+		}
+	}
+
 	GameLayer::GameLayer(Na::Ref<Na::Window> window, Na::View<Renderer> renderer)
 	: Na::Layer(0), m_Window(window), m_Renderer(renderer)
 	{
@@ -29,6 +60,11 @@ namespace Vxp
 		m_Camera.set_fov(100.0f);
 
 		RegisterAllVoxels();
+
+		m_Chunk.set_voxel(LocalPosition{ 0, 0, 0 }, VoxelTypeID::Dirt);
+		m_Chunk.set_voxel(LocalPosition{ 1, 0, 0 }, VoxelTypeID::Grass);
+
+		m_Chunk2.voxels().fill(VoxelTypeID::Dirt);
 	}
 
 	GameLayer::~GameLayer(void)
@@ -104,35 +140,12 @@ namespace Vxp
 				move.x = -amount;
 
 			m_Camera.move(move);
-
-			if (m_Input.key(Na::Keys::k_1))
-				m_CurrentVoxel = VoxelTypeID::Dirt;
-
-			if (m_Input.key(Na::Keys::k_2))
-				m_CurrentVoxel = VoxelTypeID::Grass;
-
-			if (m_Input.mouse_button(Na::MouseButtons::k_Right))
-			{
-				const auto& voxel_type = m_VoxelRegistry.get_type(m_CurrentVoxel);
-
-				if (const auto& interactable = voxel_type.get_component<InteractableComponent>())
-				{
-					interactable.on_interact();
-				}
-			}
 		}
 
 		m_Renderer->flush_quads();
 
-		const auto& voxel_type = m_VoxelRegistry.get_type(m_CurrentVoxel);
-
-		for (u8 i = 0; i < voxel_type.textures.size(); i++)
-		{
-			m_Renderer->add_quad(Quad{
-				.model = GetTransform((VoxelSide)(i + 1)),
-				.texture = voxel_type.textures[i]
-			});
-		}
+		drawChunk(m_Chunk, *m_Renderer);
+		drawChunk(m_Chunk2, *m_Renderer);
 	}
 
 	void GameLayer::draw(void)
