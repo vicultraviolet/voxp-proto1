@@ -31,6 +31,8 @@ namespace Vxp
 		Byte offset[4];
 	};
 
+	constexpr u32 k_MaxQuadsPerFlush = 32768;
+
 	class Renderer {
 	public:
 		Renderer(void) = default;

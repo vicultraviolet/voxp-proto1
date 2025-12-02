@@ -13,8 +13,8 @@ struct Instance {
 	uvec2 tex_handle;
 };
 
-layout(set = 0, binding = 0) uniform InstanceBuffer {
-    Instance data[256];
+layout(set = 0, binding = 0) readonly buffer InstanceBuffer {
+    Instance data[32768];
 } u_InstanceBuffer;
 
 layout(location = 0) in vec2 a_Position;

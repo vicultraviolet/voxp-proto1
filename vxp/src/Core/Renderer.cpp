@@ -58,9 +58,9 @@ namespace Vxp
 		m_QuadIndexBuffer = Na::Graphics::MakeIndexBuffer(6);
 		m_QuadIndexBuffer->set_data(indices.data());
 
-		m_Quads.reallocate(512);
-		m_InstanceBuffer = Na::Graphics::MakeUniformBuffer(
-			(u64)sizeof(Quad) * 512,
+		m_Quads.reallocate(k_MaxQuadsPerFlush);
+		m_InstanceBuffer = Na::Graphics::MakeStorageBuffer(
+			(u64)sizeof(Quad) * k_MaxQuadsPerFlush,
 			m_Renderer->settings()->max_frames_in_flight
 		);
 
@@ -70,7 +70,7 @@ namespace Vxp
 				Na::Graphics::UniformBinding
 				{
 					.binding = 0,
-					.type = Na::Graphics::UniformType::UniformMultibuffer,
+					.type = Na::Graphics::UniformType::StorageMultibuffer,
 					.shader_stage = Na::Graphics::ShaderStage::Vertex
 				}
 			}
@@ -85,7 +85,7 @@ namespace Vxp
 		m_GlobalUniformSet->bind(Na::Graphics::UniformSetBufferBindingInfo{
 			.binding = 0,
 			.buffer = m_InstanceBuffer,
-			.type = Na::Graphics::BufferTypeFlags::UniformBuffer
+			.type = Na::Graphics::BufferTypeFlags::StorageBuffer
 		});
 
 		m_UniformManager.init_layout(
