@@ -6,6 +6,8 @@
 namespace Vxp
 {
 	using namespace Na::Primitives;
+
+	inline Na::Logger<> g_Logger{ "Vxp" };
 } // namespace Vxp
 
 #endif // VXP_CORE_HPP
