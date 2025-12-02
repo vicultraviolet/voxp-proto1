@@ -9,17 +9,14 @@ namespace Vxp
 {
 	App::App(void)
 	{
-		auto renderer_settings = Na::MakeRef<Na::RendererSettings>();
+		auto asset_manager = Na::AssetManager::Get();
 
-		renderer_settings->max_frames_in_flight = 2;
+		auto renderer_settings = asset_manager->get_by_name<Na::RendererSettings>("renderer_settings");
 
 		m_Window = Na::MakeRef<Na::Window>(1280, 720, "Voxploration Prototype 1");
-		m_Display = Na::HL::Display::Make(m_Window, renderer_settings);
+		m_Renderer = Renderer(m_Window, renderer_settings);
 
-		m_Renderer = Na::Graphics::Renderer::Make(renderer_settings);
-		m_Renderer->bind_render_target(m_Display);
-
-		m_LayerManager.attach_layer(Na::MakeRef<GameLayer>(m_Window, m_Display, m_Renderer));
+		m_LayerManager.attach_layer(Na::MakeRef<GameLayer>(m_Window, &m_Renderer));
 	}
 
 	App::~App(void)
@@ -54,19 +51,14 @@ namespace Vxp
 			if (m_Window->minimized())
 				continue;
 
-			if (!m_Display->acquire_next_image())
+			if (!m_Renderer.begin())
 				continue;
-
-			m_Renderer->begin_frame();
-			m_Renderer->begin_render_pass(glm::vec4(0.15f, 0.1f, 0.35f, 1.0f));
 
 			for (const auto& layer : m_LayerManager)
 				layer->draw();
 
-			m_Renderer->end_render_pass();
-			m_Renderer->end_frame();
-
-			m_Display->present();
+			m_Renderer.end();
+			m_Renderer.present();
 		}
 	}
 } // namespace Vxp

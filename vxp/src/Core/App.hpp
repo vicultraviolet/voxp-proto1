@@ -1,11 +1,16 @@
 #if !defined(VXP_CORE_APP_HPP)
 #define VXP_CORE_APP_HPP
 
+#include "Core.hpp"
+
+#include <Natrium/Assets/AssetManager.hpp>
+
 #include <Natrium/Core/Window.hpp>
-#include <Natrium/HL/Renderer_HL.hpp>
 
 #include <Natrium/Core/DeltaTime.hpp>
 #include <Natrium/Layers/LayerManager.hpp>
+
+#include "Core/Renderer.hpp"
 
 namespace Vxp
 {
@@ -19,9 +24,7 @@ namespace Vxp
 
 	private:
 		Na::Ref<Na::Window> m_Window;
-		Na::Ref<Na::HL::Display> m_Display;
-
-		Na::UniqueRef<Na::Graphics::Renderer> m_Renderer;
+		Renderer m_Renderer;
 
 		Na::LayerManager m_LayerManager;
 	};
