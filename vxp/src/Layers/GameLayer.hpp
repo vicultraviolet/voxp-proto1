@@ -11,6 +11,8 @@
 
 #include <Natrium/HL/Texture_HL.hpp>
 
+#include "Voxel/VoxelRegistry.hpp"
+
 namespace Vxp
 {
 	class GameLayer : public Na::Layer
@@ -31,7 +33,11 @@ namespace Vxp
 
 		Na::Camera3dData m_Camera;
 
-		Na::Ref<Na::HL::Texture> m_Blocks;
+		Na::ArrayList<Na::Ref<Na::HL::Texture>> m_Textures;
+
+		VoxelRegistry m_VoxelRegistry;
+
+		VoxelTypeID m_CurrentVoxel = VoxelTypeID::Dirt;
 	};
 } // namespace Vxp
 

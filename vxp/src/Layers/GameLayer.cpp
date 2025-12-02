@@ -5,6 +5,9 @@
 
 #include "Voxel/VoxelSide.hpp"
 
+#include "Game/Textures.hpp"
+#include "Game/RegisterAllVoxels.hpp"
+
 namespace Vxp
 {
 	GameLayer::GameLayer(Na::Ref<Na::Window> window, Na::View<Renderer> renderer)
@@ -12,37 +15,20 @@ namespace Vxp
 	{
 		auto asset_manager = Na::AssetManager::Get();
 
-		auto renderer_settings = asset_manager->get_by_name<Na::RendererSettings>("renderer_settings");
+		m_Textures = CreateTextures();
 
-		auto dirt       = asset_manager->create_asset<Na::HostImage>("dirt");
-		auto grass_top  = asset_manager->create_asset<Na::HostImage>("grass_top");
-		auto grass_side = asset_manager->create_asset<Na::HostImage>("grass_side");
-
-		dirt->load("assets/img/dirt.png");
-		grass_top->load("assets/img/grass_top.png");
-		grass_side->load("assets/img/grass_side.png");
-
-		m_Blocks = asset_manager->create_asset<Na::HL::Texture>(
-			"blocks",
-			Na::HL::TextureDimensions(16, 16, 3),
-			renderer_settings,
-			Na::Graphics::SamplerFilter::Nearest
-		);
-
-		Na::WeakRef<const Na::HostImage> images[] = {
-			dirt, grass_top, grass_side
-		};
-		m_Blocks->set_data(images);
-
-		asset_manager->save_registry();
-
-		m_Renderer->attach_texture(0, *m_Blocks);
+		for (u32 i = 0; const auto& texture : m_Textures)
+		{
+			m_Renderer->attach_texture(i++, *texture);
+		}
 
 		m_Camera.set_aspect_ratio((float)m_Window->width() / (float)m_Window->height());
 		m_Camera.set_pos(glm::vec3(0.0f, 0.0f, 5.0f));
 		m_Camera.set_eye(glm::vec3(0.0f, 0.0f, 0.0f));
 		m_Camera.set_clip_planes(0.001f, 1000.0f);
 		m_Camera.set_fov(100.0f);
+
+		RegisterAllVoxels();
 	}
 
 	GameLayer::~GameLayer(void)
@@ -118,54 +104,35 @@ namespace Vxp
 				move.x = -amount;
 
 			m_Camera.move(move);
+
+			if (m_Input.key(Na::Keys::k_1))
+				m_CurrentVoxel = VoxelTypeID::Dirt;
+
+			if (m_Input.key(Na::Keys::k_2))
+				m_CurrentVoxel = VoxelTypeID::Grass;
+
+			if (m_Input.mouse_button(Na::MouseButtons::k_Right))
+			{
+				const auto& voxel_type = m_VoxelRegistry.get_type(m_CurrentVoxel);
+
+				if (const auto& interactable = voxel_type.get_component<InteractableComponent>())
+				{
+					interactable.on_interact();
+				}
+			}
 		}
 
 		m_Renderer->flush_quads();
 
-		glm::mat4 model(1.0f);
+		const auto& voxel_type = m_VoxelRegistry.get_type(m_CurrentVoxel);
 
-		m_Renderer->add_quad(Quad{
-			.model = model * GetTransform(VoxelSide::Front),
-			.texture = TextureHandle{
-				.descriptor_index = 0,
-				.array_index = 2
-			}
-		});
-		m_Renderer->add_quad(Quad{
-			.model = model * GetTransform(VoxelSide::Back),
-			.texture = TextureHandle{
-				.descriptor_index = 0,
-				.array_index = 2
-			}
-		});
-		m_Renderer->add_quad(Quad{
-			.model = model * GetTransform(VoxelSide::Right),
-			.texture = TextureHandle{
-				.descriptor_index = 0,
-				.array_index = 2
-			}
-		});
-		m_Renderer->add_quad(Quad{
-			.model = model * GetTransform(VoxelSide::Left),
-			.texture = TextureHandle{
-				.descriptor_index = 0,
-				.array_index = 2
-			}
-		});
-		m_Renderer->add_quad(Quad{
-			.model = model * GetTransform(VoxelSide::Top),
-			.texture = TextureHandle{
-				.descriptor_index = 0,
-				.array_index = 1
-			}
-		});
-		m_Renderer->add_quad(Quad{
-			.model = model * GetTransform(VoxelSide::Bottom),
-			.texture = TextureHandle{
-				.descriptor_index = 0,
-				.array_index = 0
-			}
-		});
+		for (u8 i = 0; i < voxel_type.textures.size(); i++)
+		{
+			m_Renderer->add_quad(Quad{
+				.model = GetTransform((VoxelSide)(i + 1)),
+				.texture = voxel_type.textures[i]
+			});
+		}
 	}
 
 	void GameLayer::draw(void)
