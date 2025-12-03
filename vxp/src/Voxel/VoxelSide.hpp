@@ -15,7 +15,11 @@ namespace Vxp
 		Last = Bottom
 	};
 
+	[[nodiscard]] glm::vec3 Offset(VoxelSide side);
+	[[nodiscard]] glm::mat4 Rotate(const glm::mat4& mat, VoxelSide side);
+
 	[[nodiscard]] const glm::mat4& GetTransform(VoxelSide side);
+
 } // namespace Vxp
 
 #endif // VXP_VOXEL_SIDE_HPP
