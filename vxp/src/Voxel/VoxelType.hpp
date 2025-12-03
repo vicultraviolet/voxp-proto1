@@ -17,7 +17,7 @@ namespace Vxp
 
 		VoxelComponents components;
 
-		[[nodiscard]] inline TextureHandle texture_at(VoxelSide side) { return textures[(u8)side]; }
+		[[nodiscard]] inline TextureHandle texture_at(VoxelSide side) const { return textures[(u64)side - 1]; }
 
 		template<typename T>
 		void set_component(const T& component)
