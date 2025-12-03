@@ -14,6 +14,7 @@
 #include "Voxel/VoxelRegistry.hpp"
 
 #include "Voxel/Chunk.hpp"
+#include "Voxel/ChunkRenderer.hpp"
 
 namespace Vxp
 {
@@ -41,6 +42,8 @@ namespace Vxp
 
 		Chunk m_Chunk{ ChunkPosition{0, 0, 0} };
 		Chunk m_Chunk2{ ChunkPosition{0, 0, -1} };
+
+		ChunkRenderer m_ChunkRenderer{ m_Renderer };
 	};
 } // namespace Vxp
 
